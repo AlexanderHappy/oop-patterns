@@ -1,0 +1,40 @@
+services:
+
+    apache:
+        container_name: ${MODULE_CODE}_apache
+        image: httpd:2.4
+        ports:
+            - ${DOCKER_APACHE_PORT}:80
+        volumes:
+            - ./:/var/www/html
+            - ./docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
+        depends_on:
+            - app
+
+    app:
+        user: "1000:1000"
+        container_name: ${MODULE_CODE}_app
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+        extra_hosts:
+            - host.docker.internal:host-gateway
+        volumes:
+            - ./:/var/www/html
+            - /etc/passwd:/etc/passwd
+            - /etc/groups:/etc/groups
+
+    db:
+        container_name: ${MODULE_CODE}_db
+        image: mysql:8.0
+        restart: always
+        volumes:
+            - ${DOCKER_DB_DATA_PATH}:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: ${DOCKER_DB_DATABASE}
+            MYSQL_USER: ${DOCKER_DB_USERNAME}
+            MYSQL_PASSWORD: ${DOCKER_DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${DOCKER_DB_ROOT_PASSWORD}
+        ports:
+            - 3306
+        command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
