@@ -28,11 +28,15 @@ class PaymentServiceProvider extends ServiceProvider
         });
 
         $this->app->bind('payment.strategy.paypal', function ($app, $params) {
-            return new PayPalPaymentStrategy($params['email'] ?? '');
+            return new PayPalPaymentStrategy(
+                $params['email'] ?? ''
+            );
         });
 
         $this->app->bind('payment.strategy.crypto', function ($app, $params) {
-            return new CryptoPaymentStrategy($params['wallet'] ?? '');
+            return new CryptoPaymentStrategy(
+                $params['wallet'] ?? ''
+            );
         });
     }
 
