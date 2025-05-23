@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Attributes\PaymentStrategy;
 use App\Interfaces\PaymentStrategyInterface;
 
+#[PaymentStrategy('crypto')]
 class CryptoPaymentStrategy implements PaymentStrategyInterface
 {
     private string $walletAddress;
@@ -17,7 +19,7 @@ class CryptoPaymentStrategy implements PaymentStrategyInterface
     {
         return [
             'status' => 'pending',
-            'transaction_id' => 'crypto_' . uniqid(),
+            'transaction_id' => 'crypto_' . uniqid('', true),
             'method' => 'cryptocurrency',
             'amount' => $amount,
             'fee' => 0, // Без комиссии

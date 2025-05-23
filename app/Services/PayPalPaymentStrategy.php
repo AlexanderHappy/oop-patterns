@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Attributes\PaymentStrategy;
 use App\Interfaces\PaymentStrategyInterface;
 
+#[PaymentStrategy('paypal')]
 class PayPalPaymentStrategy implements PaymentStrategyInterface
 {
 

@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Attributes\PaymentStrategy;
 use App\Interfaces\PaymentStrategyInterface;
 
+#[PaymentStrategy('credit_card')]
 class CreditCardPaymentStrategy implements PaymentStrategyInterface
 {
     private string $cardNumber;
