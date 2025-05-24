@@ -4,10 +4,7 @@ namespace App\Interfaces;
 
 interface NotificationsStrategyInterface
 {
-    public function send(
-        string $recipient,
-        string $message
-    ): array;
+    public function send(): array;
 
     public function getChannelName(): string;
 

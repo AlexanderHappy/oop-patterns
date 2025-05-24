@@ -3,22 +3,22 @@
 Требования:
 1. Создайте интерфейс стратегии NotificationStrategyInterface с методами:
 
-send(string $recipient, string $message): array - отправка уведомления
++send(string $recipient, string $message): array - отправка уведомления
 getChannelName(): string - название канала
-isAvailable(): bool - проверка доступности канала
++isAvailable(): bool - проверка доступности канала
 getDeliveryTime(): int - примерное время доставки в секундах
 
 2. Реализуйте конкретные стратегии:
 
-EmailNotificationStrategy - отправка email (время доставки: 30 сек, комиссия за отправку)
++-EmailNotificationStrategy - отправка email (время доставки: 30 сек, комиссия за отправку)
 SmsNotificationStrategy - отправка SMS (время доставки: 5 сек, ограничение по длине сообщения)
 PushNotificationStrategy - push-уведомления (время доставки: 1 сек, требует активное устройство)
 TelegramNotificationStrategy - через Telegram бота (время доставки: 3 сек, требует chat_id)
 
 3. Создайте контекст NotificationManager с методами:
 
-setStrategy() - установка стратегии
-sendNotification() - отправка уведомления
++setStrategy() - установка стратегии
++sendNotification() - отправка уведомления
 getAvailableChannels() - получение доступных каналов
 sendToMultipleChannels() - отправка через несколько каналов
 

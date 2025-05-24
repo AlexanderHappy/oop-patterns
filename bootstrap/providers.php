@@ -2,6 +2,6 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    App\Providers\PaymentServiceProvider::class,
+    App\Providers\NotificationsServiceProvider::class,
     App\Providers\PaymentServiceProvider::class,
 ];

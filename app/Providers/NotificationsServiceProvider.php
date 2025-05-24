@@ -2,30 +2,33 @@
 
 namespace App\Providers;
 
-use App\Attributes\PaymentStrategy;
-use App\Services\Payments\PaymentStrategyRegistry;
+use App\Attributes\NotificationsStrategy;
+use App\Services\Notifications\NotificationsStrategyRegistry;
 use Illuminate\Support\ServiceProvider;
 use ReflectionClass;
 
-class PaymentServiceProvider extends ServiceProvider
+class NotificationsServiceProvider extends ServiceProvider
 {
+    /**
+     * Register services.
+     */
     public function register(): void
     {
-        $registry = new PaymentStrategyRegistry();
+        $registry = new NotificationsStrategyRegistry();
 
-        foreach ($this->scanPaymentStrategies() as $class => $method) {
+        foreach ($this->scanStrategiesNotifications() as $class => $method) {
             $registry->register($method, $class);
         }
 
-        $this->app->instance(PaymentStrategyRegistry::class, $registry);
+        $this->app->instance(NotificationsStrategyRegistry::class, $registry);
     }
 
-    private function scanPaymentStrategies(): array
+    private function scanStrategiesNotifications(): array
     {
         $strategies = [];
         $path = app_path('Services');
 
-        $files = glob($path . '/Payments/*PaymentStrategy.php');
+        $files = glob($path . '/Notifications/*NotificationStrategy.php');
 
         foreach ($files as $file) {
             $className = $this->getClassNameFromFile($file);
@@ -35,7 +38,7 @@ class PaymentServiceProvider extends ServiceProvider
             }
 
             $reflection = new ReflectionClass($className);
-            $attributes = $reflection->getAttributes(PaymentStrategy::class);
+            $attributes = $reflection->getAttributes(NotificationsStrategy::class);
 
             if (!empty($attributes)) {
                 $attribute = $attributes[0]->newInstance();
@@ -49,9 +52,12 @@ class PaymentServiceProvider extends ServiceProvider
     private function getClassNameFromFile(string $file): string
     {
         $basename = basename($file, '.php');
-        return "App\\Services\\Payments\\{$basename}";
+        return "App\\Services\\Notifications\\$basename";
     }
 
+    /**
+     * Bootstrap services.
+     */
     public function boot(): void
     {
         //

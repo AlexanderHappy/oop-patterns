@@ -10,5 +10,5 @@ Route::prefix('payment')->group(function () {
 });
 
 Route::prefix('notifications')->group(function () {
-    Route::post('/process', [NotificationsController::class, 'send']);
+    Route::post('/send', [NotificationsController::class, 'send']);
 });
