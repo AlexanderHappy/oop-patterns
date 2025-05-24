@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Payments;
 
 use App\Attributes\PaymentStrategy;
 use App\Interfaces\PaymentStrategyInterface;

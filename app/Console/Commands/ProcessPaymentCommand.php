@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Services\CreditCardPaymentStrategy;
-use App\Services\CryptoPaymentStrategy;
-use App\Services\PaymentProcessor;
-use App\Services\PayPalPaymentStrategy;
+use App\Services\Payments\CreditCardPaymentStrategy;
+use App\Services\Payments\CryptoPaymentStrategy;
+use App\Services\Payments\PaymentProcessor;
+use App\Services\Payments\PayPalPaymentStrategy;
 use Illuminate\Console\Command;
 
 class ProcessPaymentCommand extends Command

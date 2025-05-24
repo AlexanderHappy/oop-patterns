@@ -2,49 +2,63 @@
 
 namespace App\Providers;
 
-use App\Services\CreditCardPaymentStrategy;
-use App\Services\CryptoPaymentStrategy;
-use App\Services\PaymentProcessor;
-use App\Services\PayPalPaymentStrategy;
+use App\Attributes\PaymentStrategy;
+use App\Services\Payments\PaymentProcessor;
+use App\Services\Payments\PaymentStrategyRegistry;
 use Illuminate\Support\ServiceProvider;
+use ReflectionClass;
 
 class PaymentServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     */
     public function register(): void
     {
-        $this->app->bind('payment.processor', function () {
+        $this->app->bind(PaymentProcessor::class, function () {
             return new PaymentProcessor();
         });
 
-        // Регистрация стратегий
-        $this->app->bind('payment.strategy.creditcard', function ($app, $params) {
-            return new CreditCardPaymentStrategy(
-                $params['card_number'] ?? '',
-                $params['cvv'] ?? ''
-            );
-        });
+        $registry = new PaymentStrategyRegistry();
 
-        $this->app->bind('payment.strategy.paypal', function ($app, $params) {
-            return new PayPalPaymentStrategy(
-                $params['email'] ?? ''
-            );
-        });
+        foreach ($this->scanPaymentStrategies() as $class => $method) {
+            $registry->register($method, $class);
+        }
 
-        $this->app->bind('payment.strategy.crypto', function ($app, $params) {
-            return new CryptoPaymentStrategy(
-                $params['wallet'] ?? ''
-            );
-        });
+        $this->app->instance(PaymentStrategyRegistry::class, $registry);
     }
 
-    /**
-     * Bootstrap services.
-     */
     public function boot(): void
     {
         //
+    }
+
+    private function scanPaymentStrategies(): array
+    {
+        $strategies = [];
+        $path = app_path('Services');
+
+        $files = glob($path . '/Payments/*PaymentStrategy.php');
+
+        foreach ($files as $file) {
+            $className = $this->getClassNameFromFile($file);
+
+            if (!class_exists($className)) {
+                continue;
+            }
+
+            $reflection = new ReflectionClass($className);
+            $attributes = $reflection->getAttributes(PaymentStrategy::class);
+
+            if (!empty($attributes)) {
+                $attribute = $attributes[0]->newInstance();
+                $strategies[$className] = $attribute->method;
+            }
+        }
+
+        return $strategies;
+    }
+
+    private function getClassNameFromFile(string $file): string
+    {
+        $basename = basename($file, '.php');
+        return "App\\Services\\Payments\\{$basename}";
     }
 }

@@ -3,11 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SendNotificationRequest;
+use App\Interfaces\NotificationsStrategyInterface;
+use App\Services\Notifications\NotificationsProcessor;
 use Illuminate\Http\JsonResponse;
 
-class NotificationsController
+readonly class NotificationsController
 {
-    public function send(SendNotificationRequest $request): JsonResponse
+    public function __construct(
+        private NotificationsProcessor        $notificationsProcessor,
+        private NotificationsStrategyRegistry $notificationsStrategyRegistry
+    )
+    {
+    }
+
+    public function send(
+        SendNotificationRequest $request
+    ): JsonResponse
     {
         $strategy = $this->createNotificationStrategy(
             $request->input('channel'),
@@ -15,31 +26,24 @@ class NotificationsController
                 $request->input('recipient'),
                 $request->input('message'),
                 $request->input('priority'),
+            ],
+        );
+
+        return response()->json(
+            [
+                true,
             ]
         );
     }
 
-    private function createNotificationStrategy(string $channel, array $data)
+    private function createNotificationStrategy(
+        string $method,
+        array  $data
+    ): \App\Interfaces\NotificationsStrategyInterface
     {
-        switch ($channel) {
-            case 'credit_card':
-                return app('payment.strategy.creditcard', [
-                    'card_number' => $data['card_number'] ?? '',
-                    'cvv' => $data['cvv'] ?? ''
-                ]);
-
-            case 'paypal':
-                return app('payment.strategy.paypal', [
-                    'email' => $data['email'] ?? ''
-                ]);
-
-            case 'crypto':
-                return app('payment.strategy.crypto', [
-                    'wallet' => $data['wallet_address'] ?? ''
-                ]);
-
-            default:
-                throw new \Exception('Unknown payment method');
-        }
+        return $this->notificationsStrategyRegistry->create(
+            $method,
+            $data
+        );
     }
 }
